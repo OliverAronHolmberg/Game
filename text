@@ -1,0 +1,5 @@
+def draw(self, game, player_x, player_y):
+            
+            if self.playeranimationlist[self.direction]:
+                frame = self.playeranimationlist[self.direction][self.animation_index]
+#This thing [self.animation_index]

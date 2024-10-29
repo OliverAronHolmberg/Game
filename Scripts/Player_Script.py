@@ -9,6 +9,7 @@ class Player:
 
         self.animations = animation().Playeranimations()
         
+        
 
         
     
@@ -23,23 +24,38 @@ class Player:
         self.animations.moving = False
 
         if keys[pygame.K_a]:
-            
-            self.animations.direction = "Walk_Left"
-            self.player_x -=5
+            self.animations.animationsteps = 0
+            if self.animations.direction != "Walk_Left":
+                self.animations.last_direction = "Walk_Left"
+                self.animations.direction = "Walk_Left"
+            self.player_x -=7
             self.animations.moving = True
-            
+            self.animations.LoadPlayer(self.animations.direction)
+            self.animations.animation_speed = 0.07
+                
     
         elif keys[pygame.K_d]:
-            self.animations.direction = "Walk_Right"
-            self.player_x +=5
+            self.animations.animationsteps = 0
+            if self.animations.direction != "Walk_Right":
+                self.animations.last_direction = "Walk_Right"
+                self.animations.direction = "Walk_Right"
+            self.player_x +=7
             self.animations.moving = True
-            
-
-        elif not self.animations.moving:
-            self.animations.direction = "Idle"
-            
+            self.animations.LoadPlayer(self.animations.direction)
+            self.animations.animation_speed = 0.07
                 
-        self.animations.LoadPlayer(self.animations.direction)
+
+        if not self.animations.moving:
+            self.animations.animationsteps = 0
+            self.animations.animation_speed = 0.5
+            if self.animations.last_direction == "Walk_Right":
+                self.animations.direction = "Idle_Right"
+            elif self.animations.last_direction == "Walk_Left":
+                self.animations.direction = "Idle_Left"
+            self.animations.LoadPlayer(self.animations.direction)
+            
+           
+        
         self.animations.update(self.game.clock.tick(60) / 1000.0)
             
     def draw(self):
