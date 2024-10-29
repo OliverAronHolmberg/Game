@@ -13,7 +13,7 @@ class Game:
     
         #Player
         self.player = Player(self)
-        self.player.LoadPlayer()
+        
         #FPS
         self.clock = pygame.time.Clock()
         self.fps = 60
@@ -30,7 +30,7 @@ class Game:
 
                     
             
-            self.player.update(deltatime)
+            
             self.player.draw()
             self.player.MainPlayer()
             
