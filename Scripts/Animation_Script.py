@@ -9,6 +9,10 @@ class animation:
                 "Idle_Left": pygame.image.load("Images/Player/Idle/PlayerIdle.png").convert_alpha(),
                 "Walk_Left": pygame.image.load("Images/Player/PlayerWalking/PlayerWalkingleftright.png").convert_alpha(),
                 "Walk_Right": pygame.image.load("Images/Player/PlayerWalking/PlayerWalkingleftright.png").convert_alpha(),
+                "Walk_Down":pygame.image.load("Images\Player\PlayerWalking\PlayerWalkDown.png").convert_alpha(),
+                "Idle_Down":pygame.image.load("Images\Player\Idle\PlayerIdleDown.png").convert_alpha(),
+                "Idle_Up":pygame.image.load("Images\Player\Idle\PlayerIdleUp.png").convert_alpha(),
+                "Walk_Up": pygame.image.load("Images\Player\Idle\PlayerIdleUp.png").convert_alpha(),
             }
 
             self.playeranimationlist = {key: [] for key in self.sheets.keys()}
@@ -29,10 +33,12 @@ class animation:
             if not self.playeranimationlist[direction]:
                 sprite_sheet = SpriteSheetRenderer(self.sheets[direction])
 
-                if direction in ["Idle_Right", "Idle_Left"]:
+                if direction in ["Idle_Right", "Idle_Left", "Idle_Down", "Idle_Up", "Walk_Up"]:
                     self.animationsteps = 2 
                 elif direction in ["Walk_Right", "Walk_Left"]:
                     self.animationsteps = 6 
+                elif direction in ["Walk_Down"]:
+                    self.animationsteps = 8
 
                 for x in range(self.animationsteps):
                     frame = sprite_sheet.get_image(14, 20, 5, x)
@@ -76,6 +82,12 @@ class animation:
                     case "Idle_Right":
                         pass
                     case "Walk_Right":
+                        pass
+                    case "Walk_Down":
+                        pass
+                    case "Idle_Down":
+                        pass
+                    case "Idle_Up":
                         pass
 
 

@@ -7,9 +7,14 @@ class Game:
     def __init__(self):
         #Setup
         pygame.init()
-        self.window = pygame.display.set_mode((0,0), pygame.DOUBLEBUF | pygame.FULLSCREEN)
-        self.run = True
+        self.window = pygame.display.set_mode((0,0), 0, pygame.DOUBLEBUF | pygame.FULLSCREEN)
+        
         pygame.event.set_grab(True)
+        self.run = True
+        
+            
+        #Monitor
+        
     
         #Player
         self.player = Player(self)
@@ -18,6 +23,7 @@ class Game:
         self.clock = pygame.time.Clock()
         self.fps = 60
         
+
     
     def main(self):
         while self.run:
