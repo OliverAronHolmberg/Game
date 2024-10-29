@@ -12,7 +12,14 @@ class Player:
         
         self.movementspeed = 0
         self.animatespeed = 0.05
-        
+        self.player_width = 14
+        self.player_height = 20
+
+
+        self.left_boundry = (self.game.screen_width/10) - self.player_width*4
+        self.right_boundry = self.game.screen_width - (self.game.screen_width/10) - self.player_width
+        self.top_boundry = self.game.screen_height/7 - self.player_height*4
+        self.bottom_boundry = self.game.screen_height - (self.game.screen_height/7) - self.player_height
     
 
     def MainPlayer(self):
@@ -23,6 +30,8 @@ class Player:
         
 
         self.animations.moving = False
+        move_x = 0
+        move_y = 0
 
         if keys[pygame.K_a]:
             self.animations.animationsteps = 0
@@ -34,14 +43,11 @@ class Player:
                 self.animatespeed = 0.01
             else:
                 self.movementspeed = 5
-                self.animatespeed = 0.07
-            self.player_x -=self.movementspeed
-            self.animations.moving = True
-            self.animations.LoadPlayer(self.animations.direction)
-            self.animations.animation_speed = self.animatespeed
+                self.animatespeed = 0.05
+            move_x = -self.movementspeed
                 
     
-        elif keys[pygame.K_d]:
+        if keys[pygame.K_d]:
             self.animations.animationsteps = 0
             if self.animations.direction != "Walk_Right":
                 self.animations.last_direction = "Walk_Right"
@@ -51,11 +57,8 @@ class Player:
                 self.animatespeed = 0.01
             else:
                 self.movementspeed = 5
-                self.animatespeed = 0.07
-            self.player_x += self.movementspeed
-            self.animations.moving = True
-            self.animations.LoadPlayer(self.animations.direction)
-            self.animations.animation_speed = self.animatespeed
+                self.animatespeed = 0.05
+            move_x = self.movementspeed
         
         if keys[pygame.K_s]:
             self.animations.animationsteps = 0
@@ -68,10 +71,7 @@ class Player:
             else:
                 self.movementspeed = 5
                 self.animatespeed = 0.07
-            self.player_y +=self.movementspeed
-            self.animations.moving = True
-            self.animations.LoadPlayer(self.animations.direction)
-            self.animations.animation_speed = self.animatespeed
+            move_y = self.movementspeed
         
         if keys[pygame.K_w]:
             self.animations.animationsteps = 0
@@ -84,11 +84,27 @@ class Player:
             else:
                 self.movementspeed = 5
                 self.animatespeed = 0.07
-            self.player_y -=self.movementspeed
+            move_y = -self.movementspeed
+                
+
+        if move_x != 0 and move_y != 0:
+            move_x *= 0.707
+            move_y *= 0.707
+
+            
+        new_x = self.player_x + move_x
+        new_y = self.player_y + move_y
+
+        self.player_x = max(self.left_boundry, min(self.right_boundry, new_x))
+        self.player_y = max(self.top_boundry, min(self.bottom_boundry, new_y))
+
+        if keys[pygame.K_a] or keys[pygame.K_d] or keys[pygame.K_w] or keys[pygame.K_s]:
             self.animations.moving = True
             self.animations.LoadPlayer(self.animations.direction)
             self.animations.animation_speed = self.animatespeed
-                
+
+
+            
 
         if not self.animations.moving:
             self.animations.animationsteps = 0

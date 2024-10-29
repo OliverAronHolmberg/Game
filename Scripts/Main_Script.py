@@ -14,14 +14,18 @@ class Game:
         
             
         #Monitor
-        
+        display_info = pygame.display.Info()
+        self.screen_width = display_info.current_w
+        self.screen_height = display_info.current_h
     
         #Player
         self.player = Player(self)
         
+        
         #FPS
         self.clock = pygame.time.Clock()
         self.fps = 60
+        
         
 
     
