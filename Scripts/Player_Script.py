@@ -4,10 +4,26 @@ from Animation_Script import animation
 class Player:
     def __init__(self, game):
         self.game = game
-        self.player_x = 100
-        self.player_y = 100
+        self.player_x = 200
+        self.player_y = 200
 
-        self.animations = animation().Playeranimations()
+
+        self.sheets = {
+                "Idle_Right": pygame.image.load("Images/Player/Idle/PlayerIdle.png").convert_alpha(),
+                "Idle_Left": pygame.image.load("Images/Player/Idle/PlayerIdle.png").convert_alpha(),
+                "Walk_Left": pygame.image.load("Images/Player/PlayerWalking/PlayerWalkingleftright.png").convert_alpha(),
+                "Walk_Right": pygame.image.load("Images/Player/PlayerWalking/PlayerWalkingleftright.png").convert_alpha(),
+                "Walk_Down":pygame.image.load("Images\Player\PlayerWalking\PlayerWalkDown.png").convert_alpha(),
+                "Idle_Down":pygame.image.load("Images\Player\Idle\PlayerIdleDown.png").convert_alpha(),
+                "Idle_Up":pygame.image.load("Images\Player\Idle\PlayerIdleUp.png").convert_alpha(),
+                "Walk_Up": pygame.image.load("Images\Player\Idle\PlayerIdleUp.png").convert_alpha(),
+            }
+        self.direction = "Idle_Down" 
+
+        self.animations = animation(self.sheets, self.direction)
+
+
+        
         
         
         self.movementspeed = 0
@@ -20,7 +36,9 @@ class Player:
         self.right_boundry = self.game.screen_width - (self.game.screen_width/10) - self.player_width
         self.top_boundry = self.game.screen_height/7 - self.player_height*4
         self.bottom_boundry = self.game.screen_height - (self.game.screen_height/7) - self.player_height
-    
+        
+        colliderheight = self.player_height//4
+        self.collider = pygame.Rect(self.player_x, self.player_y + self.player_height - colliderheight, self.player_width, colliderheight)
 
     def MainPlayer(self):
         #Exit
@@ -100,7 +118,7 @@ class Player:
 
         if keys[pygame.K_a] or keys[pygame.K_d] or keys[pygame.K_w] or keys[pygame.K_s]:
             self.animations.moving = True
-            self.animations.LoadPlayer(self.animations.direction)
+            self.animations.Load_animation_frames(self.animations.direction)
             self.animations.animation_speed = self.animatespeed
 
 
@@ -118,12 +136,21 @@ class Player:
                 self.animations.direction = "Idle_Down"
             elif self.animations.last_direction == "Walk_Up":
                 self.animations.direction = "Idle_Up"
-            self.animations.LoadPlayer(self.animations.direction)
+            self.animations.Load_animation_frames(self.animations.direction)
             
-            
+        self.update_collider()
+
+
+        
            
         
         self.animations.update(self.game.clock.tick(60) / 1000.0)
+
+    def update_collider(self):
+        colliderheight= self.player_height//4
+        self.collider = pygame.Rect(self.player_x, self.player_y + self.player_height - colliderheight, self.player_width, colliderheight)
+
+        
             
     def draw(self):
         self.animations.draw(self.game, self.player_x, self.player_y)

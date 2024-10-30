@@ -2,22 +2,15 @@ import pygame
 from Renderer_script import SpriteSheetRenderer
 
 class animation:
-    class Playeranimations:
-        def __init__(self):
-            self.sheets = {
-                "Idle_Right": pygame.image.load("Images/Player/Idle/PlayerIdle.png").convert_alpha(),
-                "Idle_Left": pygame.image.load("Images/Player/Idle/PlayerIdle.png").convert_alpha(),
-                "Walk_Left": pygame.image.load("Images/Player/PlayerWalking/PlayerWalkingleftright.png").convert_alpha(),
-                "Walk_Right": pygame.image.load("Images/Player/PlayerWalking/PlayerWalkingleftright.png").convert_alpha(),
-                "Walk_Down":pygame.image.load("Images\Player\PlayerWalking\PlayerWalkDown.png").convert_alpha(),
-                "Idle_Down":pygame.image.load("Images\Player\Idle\PlayerIdleDown.png").convert_alpha(),
-                "Idle_Up":pygame.image.load("Images\Player\Idle\PlayerIdleUp.png").convert_alpha(),
-                "Walk_Up": pygame.image.load("Images\Player\Idle\PlayerIdleUp.png").convert_alpha(),
-            }
+
+    def __init__(self, sheets, direction):
+            
+            self.sheets = sheets
+            self.direction = direction
 
             self.playeranimationlist = {key: [] for key in self.sheets.keys()}
 
-            self.direction = "Idle_Right"  
+             
             self.moving = False
             self.last_direction = self.direction
 
@@ -26,9 +19,9 @@ class animation:
             self.animation_speed = 0.1
 
             
-            self.LoadPlayer(self.direction)
+            self.Load_animation_frames(self.direction)
 
-        def LoadPlayer(self, direction):
+    def Load_animation_frames(self, direction):
             
             if not self.playeranimationlist[direction]:
                 sprite_sheet = SpriteSheetRenderer(self.sheets[direction])
@@ -48,7 +41,7 @@ class animation:
             
             
 
-        def update(self, deltatime):
+    def update(self, deltatime):
             self.animation_timer += deltatime
             if self.animation_timer >= self.animation_speed and self.playeranimationlist[self.direction]:
                 self.animation_index = (self.animation_index + 1) % len(self.playeranimationlist[self.direction])
@@ -56,13 +49,13 @@ class animation:
 
                   
 
-        def change_direction(self, new_direction):
+    def change_direction(self, new_direction):
             if new_direction != self.direction:
                 self.direction = new_direction
                 self.animation_index = 0  
-                self.LoadPlayer(new_direction)  
+                self.Load_animation_frames(new_direction)  
 
-        def draw(self, game, player_x, player_y):
+    def draw(self, game, player_x, player_y):
             
             if self.playeranimationlist[self.direction]:
 
@@ -79,16 +72,18 @@ class animation:
                         frame = pygame.transform.flip(frame, True, False)
                     case "Walk_Left":
                         frame = pygame.transform.flip(frame, True, False)
-                    case "Idle_Right":
-                        pass
-                    case "Walk_Right":
-                        pass
-                    case "Walk_Down":
-                        pass
-                    case "Idle_Down":
-                        pass
-                    case "Idle_Up":
-                        pass
+                    
 
 
                 game.window.blit(frame, (player_x, player_y))
+
+
+
+        
+
+
+
+
+
+
+        

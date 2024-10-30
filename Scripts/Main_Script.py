@@ -1,7 +1,7 @@
 import pygame
 import sys
 from Player_Script import Player
-
+from Entity_script import Entity
 
 class Game:
     def __init__(self):
@@ -20,6 +20,9 @@ class Game:
     
         #Player
         self.player = Player(self)
+
+        #Villager
+        self.villager = Entity(self, "Villager", 14, 20, None, "Menu")
         
         
         #FPS
@@ -40,12 +43,25 @@ class Game:
 
                     
             
-            
-            self.player.draw()
+            self.villager.main()
             self.player.MainPlayer()
+            self.render_entities()
+
+            if self.villager.collider.colliderect(self.player.collider):
+                print("Hello")
             
 
             pygame.display.flip()
+            
+
+    def render_entities(self):
+        render_object = [(self.player, self.player.player_y),
+                         (self.villager, self.villager.pos_y)]
+        
+        render_object.sort(key=lambda obj: obj[1])
+
+        for entity, _ in render_object:
+            entity.draw()
 
     def exitfunc(self):
         self.run = False
@@ -53,7 +69,7 @@ class Game:
         sys.exit()
 
     def clearwindow(self):
-        self.window.fill((50,50,50))
+        self.window.fill((50,150,50))
 
 
 if __name__ == "__main__":
