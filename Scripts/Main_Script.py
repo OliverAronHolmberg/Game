@@ -1,6 +1,6 @@
 import pygame
 import sys
-from Player_Script import Player
+
 from Entity_script import Entity
 
 class Game:
@@ -19,7 +19,7 @@ class Game:
         self.screen_height = display_info.current_h
     
         #Player
-        self.player = Player(self)
+        self.player = Entity.Player(self)
 
         #Villager
         self.villager = Entity(self, "Villager", 14, 20, None, "Menu")
@@ -47,8 +47,7 @@ class Game:
             self.player.MainPlayer()
             self.render_entities()
 
-            if self.villager.collider.colliderect(self.player.collider):
-                print("Hello")
+            
             
 
             pygame.display.flip()
