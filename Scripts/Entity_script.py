@@ -1,6 +1,7 @@
 import pygame
 from Renderer_script import SpriteSheetRenderer
 from Animation_Script import animation
+from Moving_Rects_Scripts import Moving_Rect
 
 class Entity:
 
@@ -66,7 +67,7 @@ class Entity:
 
     def updatecollider(self):
         collider_height = self.size_y*5//3
-        collider_width = self.size_x + self.size_x*5-20
+        collider_width = self.size_x* 5
         self.collider = pygame.Rect(self.pos_x, self.pos_y + self.size_y-collider_height, collider_width, collider_height)
 
     def checkcollisions(self):
@@ -78,14 +79,14 @@ class Entity:
 
     def draw(self):
         if self.animations:
-            self.animations.draw(self.game, self.collider.x, self.collider.y)
+            self.animations.draw(self.game, self.collider.x+self.size_x, self.collider.y)
         else:
             width = self.collider.x
             height = self.collider.y
             sprite_renderer = SpriteSheetRenderer(self.sheets["Idle_Down"])
             scaled_image = sprite_renderer.get_image(width, height, 5, 0)
-            self.game.window.blit(scaled_image, (width, height))
-        pygame.draw.rect(self.game.window, (255,0,0), self.collider, 0)
+            self.game.window.blit(scaled_image, (self.collider.x-self.size_x, self.collider.y-self.size_y*2.5))
+        pygame.draw.rect(self.game.window, (255,0,0), self.collider, 2)
             
     
 
@@ -100,8 +101,8 @@ class Entity:
             self.direction = "Idle_Down" 
 
             self.animations = animation(self.sheets, self.direction)
-
-
+            self.world_offset_x = 0
+            self.world_offset_y = 0
             
             
             
@@ -244,6 +245,7 @@ class Entity:
             
 
             self.update_playercollider()
+                
             
 
             if any(entity.collider.colliderect(self.collider) for entity in self.game.entities):
@@ -274,7 +276,7 @@ class Entity:
                 self.animations.Load_animation_frames(self.animations.direction)
                 
             
-
+            
             
             
             
