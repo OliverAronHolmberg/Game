@@ -1,7 +1,7 @@
 import pygame
 from Renderer_script import SpriteSheetRenderer
 from Animation_Script import animation
-from Moving_Rects_Scripts import Moving_Rect
+
 
 class Entity:
 
@@ -20,7 +20,7 @@ class Entity:
         self.canmove = canmove
         self.moving = False
         self.static = static
-
+        self.collider = (0,0,0,0)
         
         
         
@@ -50,6 +50,7 @@ class Entity:
 
 
     def main(self):
+        
         if self.animations:
             if not self.animations.moving:
                 self.animations.animationsteps = 0
@@ -62,6 +63,7 @@ class Entity:
             
             deltatime = self.game.clock.tick(60) / 1000.0
             self.animations.update(deltatime)
+        
         self.updatecollider()
         self.checkcollisions()
 
@@ -78,15 +80,17 @@ class Entity:
 
 
     def draw(self):
+        offset_x = self.pos_x + self.game.player.world_offset_x
+        offset_y = self.pos_y + self.game.player.world_offset_y
+        self.updatecollider()
         if self.animations:
-            self.animations.draw(self.game, self.collider.x+self.size_x, self.collider.y)
+            self.animations.draw(self.game, offset_x, offset_y)
         else:
-            width = self.collider.x
-            height = self.collider.y
             sprite_renderer = SpriteSheetRenderer(self.sheets["Idle_Down"])
-            scaled_image = sprite_renderer.get_image(width, height, 5, 0)
-            self.game.window.blit(scaled_image, (self.collider.x-self.size_x, self.collider.y-self.size_y*2.5))
-        pygame.draw.rect(self.game.window, (255,0,0), self.collider, 2)
+            scaled_image = sprite_renderer.get_image(offset_x, offset_y, 5, 0)
+            self.game.window.blit(scaled_image, (offset_x-self.size_x,offset_y-self.size_y*3.5))
+        ajust_collider = self.collider.move(self.game.player.world_offset_x, self.game.player.world_offset_y)
+        pygame.draw.rect(self.game.window, (255,0,0), ajust_collider, 2)
             
     
 
@@ -149,7 +153,13 @@ class Entity:
             move_x = 0
             move_y = 0
             
-            
+            if keys[pygame.K_LSHIFT]:
+                self.movementspeed = 9
+                self.animatespeed = 0.01
+            else:
+                self.movementspeed = 5
+                self.animatespeed = 0.05
+                self.animatespeed = 0.05
 
             
             self.colliding = Entity.checkcollisions(self)
@@ -161,12 +171,7 @@ class Entity:
                 if self.animations.direction != "Walk_Left":
                     self.animations.last_direction = "Walk_Left"
                     self.animations.direction = "Walk_Left"
-                if keys[pygame.K_LSHIFT]:
-                    self.movementspeed = 9
-                    self.animatespeed = 0.01
-                else:
-                    self.movementspeed = 5
-                    self.animatespeed = 0.05
+                
                 
                 move_x = -self.movementspeed
                 
@@ -185,13 +190,7 @@ class Entity:
                 if self.animations.direction != "Walk_Right":
                     self.animations.last_direction = "Walk_Right"
                     self.animations.direction = "Walk_Right"
-                if keys[pygame.K_LSHIFT]:
-                    self.movementspeed = 9
-                    self.animatespeed = 0.01
-                else:
-                    self.movementspeed = 5
-                    self.animatespeed = 0.05
-                    self.animatespeed = 0.05
+                
                 
                 move_x = self.movementspeed
                 
@@ -202,13 +201,7 @@ class Entity:
                 if self.animations.direction != "Walk_Down":
                     self.animations.last_direction = "Walk_Down"
                     self.animations.direction = "Walk_Down"
-                if keys[pygame.K_LSHIFT]:
-                    self.movementspeed = 9
-                    self.animatespeed = 0.01
-                else:
-                    self.movementspeed = 5
-                    self.animatespeed = 0.07
-                    self.animatespeed = 0.05
+                
                 
                 move_y = self.movementspeed
                 
@@ -219,13 +212,6 @@ class Entity:
                 if self.animations.direction != "Walk_Up":
                     self.animations.last_direction = "Walk_Up"
                     self.animations.direction = "Walk_Up"
-                if keys[pygame.K_LSHIFT]:
-                    self.movementspeed = 9
-                    self.animatespeed = 0.02
-                else:
-                    self.movementspeed = 5
-                    self.animatespeed = 0.07
-                    self.animatespeed = 0.05
                 
                 move_y = -self.movementspeed
             
@@ -239,9 +225,23 @@ class Entity:
             last_x = self.player_x
             last_y = self.player_y
 
-            self.player_x = max(self.left_boundry, min(self.right_boundry, new_x))
-            self.player_y = max(self.top_boundry, min(self.bottom_boundry, new_y))
+            
 
+            if new_y < self.top_boundry:
+                self.world_offset_y += self.movementspeed
+            elif new_y > self.bottom_boundry:
+                self.world_offset_y -= self.movementspeed
+            else:
+                self.player_y = new_y
+
+            if new_x < self.left_boundry:
+                self.world_offset_x += self.movementspeed
+            elif new_x > self.right_boundry:
+                self.world_offset_x -= self.movementspeed
+            else:
+                self.player_x = new_x 
+            
+            
             
 
             self.update_playercollider()

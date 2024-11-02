@@ -9,6 +9,8 @@ class Game:
         #Setup
         pygame.init()
         self.window = pygame.display.set_mode((0,0), 0, pygame.DOUBLEBUF | pygame.FULLSCREEN)
+        pygame.display.set_caption("Game alpha")
+        pygame.display.set_icon(pygame.image.load("Images\Player\Idle\PlayerIdle.png"))
         
         pygame.event.set_grab(True)
         self.run = True
