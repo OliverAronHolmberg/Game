@@ -12,17 +12,17 @@ class Game:
         pygame.event.set_grab(True)
         self.run = True
         
-            
+        
         #Monitor
         display_info = pygame.display.Info()
         self.screen_width = display_info.current_w
         self.screen_height = display_info.current_h
     
-        #Player
+        #Entities
+        self.entity = Entity(self, "House1", 128, 128, None, None)
+        self.entity = Entity(self, "Villager", 14, 20, None, "Menu")
         self.player = Entity.Player(self)
-
-        #Villager
-        self.villager = Entity(self, "Villager", 14, 20, None, "Menu")
+        
         
         
         #FPS
@@ -43,7 +43,7 @@ class Game:
 
                     
             
-            self.villager.main()
+            self.entity.main()
             self.player.MainPlayer()
             self.render_entities()
 
@@ -51,11 +51,13 @@ class Game:
             
 
             pygame.display.flip()
+
+    
             
 
     def render_entities(self):
         render_object = [(self.player, self.player.player_y),
-                         (self.villager, self.villager.pos_y)]
+                         (self.entity, self.entity.pos_y)]
         
         render_object.sort(key=lambda obj: obj[1])
 

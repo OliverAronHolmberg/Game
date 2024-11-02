@@ -16,20 +16,25 @@ class Entity:
 
         self.pos_x = 200
         self.pos_y = 400
+        if self.entitytype == "Villager":
+            self.sheets = {"Idle_Down": pygame.image.load("Images\Villager\Idle\VillagerIdle.png").convert_alpha(),}
+        if self.entitytype == "House1":
+            self.sheets = {"Idle_Down": pygame.image.load("Images\Enviorment\VIllage\House\House1.png").convert_alpha(),}
 
-        self.sheets = {"Idle_Down": pygame.image.load("Images\Villager\Idle\VillagerIdle.png").convert_alpha(),}
-        self.direction = "Idle_Down"
         
+        self.direction = "Idle_Down"
         self.animations = animation(self.sheets, self.direction)
         
         self.movementspeed = 0
         self.animatespeed = 0.05
         
 
-        colliderheight = self.size_y//4
-        self.collider = pygame.Rect(self.pos_x, self.pos_y + self.size_y - colliderheight, self.size_x, colliderheight)
-        
+        collider_height = self.size_y//4+10
+        collider_width = self.size_x
+        self.collider = pygame.Rect(self.pos_x - 10, self.pos_y + self.size_y-collider_height, collider_width, collider_height)
 
+    
+        
 
     def main(self):
         if not self.animations.moving:
@@ -46,15 +51,24 @@ class Entity:
                 self.animations.direction = "Idle_Up"
             self.animations.Load_animation_frames(self.animations.direction)
             
-
+        
 
 
         self.animations.update(self.game.clock.tick(60) / 1000.0)
         self.updatecollider()
+        self.checkcollisions()
 
     def updatecollider(self):
-        collider_height = self.size_y//4
-        self.collider.topleft = (self.pos_x, self.pos_y + self.size_y - collider_height)
+        collider_height = self.size_y//4+10
+        collider_width = self.size_x + self.size_x*3
+        self.collider = pygame.Rect(self.pos_x - 10, self.pos_y + self.size_y-collider_height, collider_width, collider_height)
+
+    def checkcollisions(self):
+        if self.collider.colliderect(self.game.player.collider):
+            return True
+        return False
+
+            
 
 
     def draw(self):
@@ -64,9 +78,9 @@ class Entity:
     class Player:
         def __init__(self, game):
             self.game = game
-            self.player_x = 200
-            self.player_y = 200
-
+            self.player_x = 500
+            self.player_y = 500
+            
 
             self.sheets = {
                     "Idle_Right": pygame.image.load("Images/Player/Idle/PlayerIdle.png").convert_alpha(),
@@ -97,8 +111,11 @@ class Entity:
             self.top_boundry = self.game.screen_height/7 - self.player_height*4
             self.bottom_boundry = self.game.screen_height - (self.game.screen_height/7) - self.player_height
             
-            colliderheight = self.player_height//4
-            self.collider = pygame.Rect(self.player_x, self.player_y + self.player_height - colliderheight, self.player_width, colliderheight)
+            playercolliderheight = self.player_height//4+10
+            playercolliderwidth = self.player_width+30
+            self.collider = pygame.Rect(self.player_x, self.player_y + self.player_height - playercolliderheight, playercolliderwidth, playercolliderheight)
+
+            self.update_playercollider()
 
         def MainPlayer(self):
             #Exit
@@ -106,10 +123,16 @@ class Entity:
             if keys[pygame.K_ESCAPE]:
                 self.game.exitfunc()
             
-
+            
             self.animations.moving = False
             move_x = 0
             move_y = 0
+            
+            
+            
+            self.colliding = Entity.checkcollisions(self)
+            
+
 
             if keys[pygame.K_a]:
                 self.animations.animationsteps = 0
@@ -122,9 +145,16 @@ class Entity:
                 else:
                     self.movementspeed = 5
                     self.animatespeed = 0.05
+                
                 move_x = -self.movementspeed
-                if self.collider.colliderect(Entity.collider):
-                    print("Hello")
+                
+                
+                    
+                
+
+                
+                
+            
                 
                     
         
@@ -139,8 +169,12 @@ class Entity:
                 else:
                     self.movementspeed = 5
                     self.animatespeed = 0.05
+                    self.animatespeed = 0.05
+                
                 move_x = self.movementspeed
-            
+                
+
+                
             if keys[pygame.K_s]:
                 self.animations.animationsteps = 0
                 if self.animations.direction != "Walk_Down":
@@ -152,8 +186,12 @@ class Entity:
                 else:
                     self.movementspeed = 5
                     self.animatespeed = 0.07
+                    self.animatespeed = 0.05
+                
                 move_y = self.movementspeed
-            
+                
+
+                
             if keys[pygame.K_w]:
                 self.animations.animationsteps = 0
                 if self.animations.direction != "Walk_Up":
@@ -165,20 +203,32 @@ class Entity:
                 else:
                     self.movementspeed = 5
                     self.animatespeed = 0.07
+                    self.animatespeed = 0.05
+                
                 move_y = -self.movementspeed
-                    
-
+            
             if move_x != 0 and move_y != 0:
                 move_x *= 0.707
                 move_y *= 0.707
 
-                
             new_x = self.player_x + move_x
             new_y = self.player_y + move_y
+
+            last_x = self.player_x
+            last_y = self.player_y
 
             self.player_x = max(self.left_boundry, min(self.right_boundry, new_x))
             self.player_y = max(self.top_boundry, min(self.bottom_boundry, new_y))
 
+
+            self.update_playercollider()
+            
+
+            if self.game.entity.checkcollisions():
+                self.player_x = last_x
+                self.player_y = last_y
+                self.update_playercollider()
+        
             if keys[pygame.K_a] or keys[pygame.K_d] or keys[pygame.K_w] or keys[pygame.K_s]:
                 self.animations.moving = True
                 self.animations.Load_animation_frames(self.animations.direction)
@@ -201,17 +251,19 @@ class Entity:
                     self.animations.direction = "Idle_Up"
                 self.animations.Load_animation_frames(self.animations.direction)
                 
-            self.update_collider()
+            
 
-
+            
             
             
             
             self.animations.update(self.game.clock.tick(60) / 1000.0)
 
-        def update_collider(self):
-            colliderheight= self.player_height//4
-            self.collider = pygame.Rect(self.player_x, self.player_y + self.player_height - colliderheight, self.player_width, colliderheight)
+        def update_playercollider(self):
+            playercolliderheight = self.player_height//4+10
+            playercolliderwidth = self.player_width+30
+            self.collider = pygame.Rect(self.player_x, self.player_y + self.player_height - playercolliderheight, playercolliderwidth, playercolliderheight)
+        
 
             
                 
