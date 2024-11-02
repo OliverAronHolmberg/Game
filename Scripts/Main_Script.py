@@ -19,8 +19,10 @@ class Game:
         self.screen_height = display_info.current_h
     
         #Entities
-        self.entity = Entity(self, "House1", 128, 128, None, None)
-        self.entity = Entity(self, "Villager", 14, 20, None, "Menu")
+        self.entities = [
+                        Entity(self, "Villager", 14, 20, 200, 200, True, None, "Menu"),
+                        Entity(self, "House1", 88, 112, 500, 300, False, None, None),
+                        ]
         self.player = Entity.Player(self)
         
         
@@ -35,15 +37,19 @@ class Game:
     def main(self):
         while self.run:
             self.clearwindow()
-            deltatime = self.clock.tick(self.fps) / 1000.0
+            self.clock.tick(self.fps) / 1000.0
+            print(self.clock.get_fps())
+            
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.exitfunc()
 
                     
-            
-            self.entity.main()
+            for entity in self.entities:
+                if abs(entity.pos_x - self.player.player_x) < self.screen_width // 2 \
+                        and abs(entity.pos_y - self.player.player_y) < self.screen_height // 2:
+                    entity.main()
             self.player.MainPlayer()
             self.render_entities()
 
@@ -56,8 +62,7 @@ class Game:
             
 
     def render_entities(self):
-        render_object = [(self.player, self.player.player_y),
-                         (self.entity, self.entity.pos_y)]
+        render_object = [(self.player, self.player.player_y)] +[(entity, entity.pos_y) for entity in self.entities]
         
         render_object.sort(key=lambda obj: obj[1])
 

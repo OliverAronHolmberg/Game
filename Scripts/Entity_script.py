@@ -3,58 +3,58 @@ from Renderer_script import SpriteSheetRenderer
 from Animation_Script import animation
 
 class Entity:
-    def __init__(self, game, entitytype, size_x, size_y, animations, mission=None, trading=None):
+
+    image_cache = {}
+
+    def __init__(self, game, entitytype, size_x, size_y, x, y, animations, canmove, mission=None, trading=None):
         self.game = game
         self.entitytype = entitytype
         self.size_x = size_x
         self.size_y = size_y
+        self.pos_x = x
+        self.pos_y = y
         self.animations = animations
         self.mission = mission
         self.trading = trading
-
+        self.canmove = canmove
         self.moving = False
 
-        self.pos_x = 200
-        self.pos_y = 400
-        if self.entitytype == "Villager":
-            self.sheets = {"Idle_Down": pygame.image.load("Images\Villager\Idle\VillagerIdle.png").convert_alpha(),}
-        if self.entitytype == "House1":
-            self.sheets = {"Idle_Down": pygame.image.load("Images\Enviorment\VIllage\House\House1.png").convert_alpha(),}
-
+        
+        
         
         self.direction = "Idle_Down"
-        self.animations = animation(self.sheets, self.direction)
         
         self.movementspeed = 0
         self.animatespeed = 0.05
         
 
-        collider_height = self.size_y//4+10
-        collider_width = self.size_x
-        self.collider = pygame.Rect(self.pos_x - 10, self.pos_y + self.size_y-collider_height, collider_width, collider_height)
+        if entitytype not in Entity.image_cache:
+            Entity.image_cache[entitytype] = self.load_image(entitytype)
+        self.sheets = Entity.image_cache[entitytype]
+        self.animations = animation(self.sheets, self.direction)
+        self.updatecollider()
 
     
-        
+    def load_image(self, entitytype):
+        if entitytype == "Villager":
+            return {"Idle_Down": pygame.image.load("Images\Villager\Idle\VillagerIdle.png").convert_alpha(),}
+        elif entitytype == "House1":
+            return {"Idle_Down": pygame.image.load("Images\Enviorment\VIllage\House\House1.png").convert_alpha(),}
+        return {}
+
 
     def main(self):
         if not self.animations.moving:
             self.animations.animationsteps = 0
             self.animatespeed = 0.5
             self.animations.animation_speed = self.animatespeed
-            if self.animations.last_direction == "Walk_Right":
-                self.animations.direction = "Idle_Right"
-            elif self.animations.last_direction == "Walk_Left":
-                self.animations.direction = "Idle_Left"
-            elif self.animations.last_direction == "Walk_Down":
-                self.animations.direction = "Idle_Down"
-            elif self.animations.last_direction == "Walk_Up":
-                self.animations.direction = "Idle_Up"
+            self.animations.direction= "Idle_" + self.animations.last_direction.split("_")[1]
             self.animations.Load_animation_frames(self.animations.direction)
             
         
 
-
-        self.animations.update(self.game.clock.tick(60) / 1000.0)
+        deltatime = self.game.clock.tick(60) / 1000.0
+        self.animations.update(deltatime)
         self.updatecollider()
         self.checkcollisions()
 
@@ -64,9 +64,8 @@ class Entity:
         self.collider = pygame.Rect(self.pos_x - 10, self.pos_y + self.size_y-collider_height, collider_width, collider_height)
 
     def checkcollisions(self):
-        if self.collider.colliderect(self.game.player.collider):
-            return True
-        return False
+        return self.collider.colliderect(self.game.player.collider)
+        
 
             
 
@@ -82,16 +81,7 @@ class Entity:
             self.player_y = 500
             
 
-            self.sheets = {
-                    "Idle_Right": pygame.image.load("Images/Player/Idle/PlayerIdle.png").convert_alpha(),
-                    "Idle_Left": pygame.image.load("Images/Player/Idle/PlayerIdle.png").convert_alpha(),
-                    "Walk_Left": pygame.image.load("Images/Player/PlayerWalking/PlayerWalkingleftright.png").convert_alpha(),
-                    "Walk_Right": pygame.image.load("Images/Player/PlayerWalking/PlayerWalkingleftright.png").convert_alpha(),
-                    "Walk_Down":pygame.image.load("Images\Player\PlayerWalking\PlayerWalkDown.png").convert_alpha(),
-                    "Idle_Down":pygame.image.load("Images\Player\Idle\PlayerIdleDown.png").convert_alpha(),
-                    "Idle_Up":pygame.image.load("Images\Player\Idle\PlayerIdleUp.png").convert_alpha(),
-                    "Walk_Up": pygame.image.load("Images\Player\Idle\PlayerIdleUp.png").convert_alpha(),
-                }
+            self.sheets = Entity.image_cache.get("Player") or self.load_images()
             self.direction = "Idle_Down" 
 
             self.animations = animation(self.sheets, self.direction)
@@ -116,6 +106,21 @@ class Entity:
             self.collider = pygame.Rect(self.player_x, self.player_y + self.player_height - playercolliderheight, playercolliderwidth, playercolliderheight)
 
             self.update_playercollider()
+
+        def load_images(self):
+            images = {
+                    "Idle_Right": pygame.image.load("Images/Player/Idle/PlayerIdle.png").convert_alpha(),
+                    "Idle_Left": pygame.image.load("Images/Player/Idle/PlayerIdle.png").convert_alpha(),
+                    "Walk_Left": pygame.image.load("Images/Player/PlayerWalking/PlayerWalkingleftright.png").convert_alpha(),
+                    "Walk_Right": pygame.image.load("Images/Player/PlayerWalking/PlayerWalkingleftright.png").convert_alpha(),
+                    "Walk_Down":pygame.image.load("Images\Player\PlayerWalking\PlayerWalkDown.png").convert_alpha(),
+                    "Idle_Down":pygame.image.load("Images\Player\Idle\PlayerIdleDown.png").convert_alpha(),
+                    "Idle_Up":pygame.image.load("Images\Player\Idle\PlayerIdleUp.png").convert_alpha(),
+                    "Walk_Up": pygame.image.load("Images\Player\Idle\PlayerIdleUp.png").convert_alpha(),
+            }
+            Entity.image_cache["Player"] = images
+            return images
+
 
         def MainPlayer(self):
             #Exit
@@ -220,11 +225,12 @@ class Entity:
             self.player_x = max(self.left_boundry, min(self.right_boundry, new_x))
             self.player_y = max(self.top_boundry, min(self.bottom_boundry, new_y))
 
+            
 
             self.update_playercollider()
             
 
-            if self.game.entity.checkcollisions():
+            if any(entity.collider.colliderect(self.collider) for entity in self.game.entities):
                 self.player_x = last_x
                 self.player_y = last_y
                 self.update_playercollider()

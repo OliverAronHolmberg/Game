@@ -8,9 +8,6 @@ class SpriteSheetRenderer:
             image = pygame.Surface((width, height), pygame.SRCALPHA)
             image.blit(self.image, (0 , 0), ((frame*width) , 0, width, height))
             image = pygame.transform.scale(image, (width*scale, height*scale))
-
-            
-
             return image
     
     
