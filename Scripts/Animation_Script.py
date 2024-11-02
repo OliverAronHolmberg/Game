@@ -25,20 +25,21 @@ class animation:
             
             if not self.playeranimationlist[direction]:
                 sprite_sheet = SpriteSheetRenderer(self.sheets[direction])
-
-                if direction in ["Idle_Right", "Idle_Left", "Idle_Down", "Idle_Up", "Walk_Up"]:
-                    self.animationsteps = 2 
-                elif direction in ["Walk_Right", "Walk_Left"]:
-                    self.animationsteps = 6 
-                elif direction in ["Walk_Down"]:
-                    self.animationsteps = 8
+                self.animationsteps = self.get_animation_steps(direction)
+                
 
                 for x in range(self.animationsteps):
                     frame = sprite_sheet.get_image(14, 20, 5, x)
                     self.playeranimationlist[direction].append(frame)
                 
-
-            
+    def get_animation_steps(self, direction):
+            if direction in ["Idle_Right", "Idle_Left", "Idle_Down", "Idle_Up", "Walk_Up"]:
+                    return 2 
+            elif direction in ["Walk_Right", "Walk_Left"]:
+                    return 6 
+            elif direction in ["Walk_Down"]:
+                    return 8
+            return 0
             
 
     def update(self, deltatime):

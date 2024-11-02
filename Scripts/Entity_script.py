@@ -6,7 +6,7 @@ class Entity:
 
     image_cache = {}
 
-    def __init__(self, game, entitytype, size_x, size_y, x, y, animations, canmove, mission=None, trading=None):
+    def __init__(self, game, entitytype, size_x, size_y, x, y, canmove, static, animations, mission=None, trading=None):
         self.game = game
         self.entitytype = entitytype
         self.size_x = size_x
@@ -18,6 +18,7 @@ class Entity:
         self.trading = trading
         self.canmove = canmove
         self.moving = False
+        self.static = static
 
         
         
@@ -31,7 +32,11 @@ class Entity:
         if entitytype not in Entity.image_cache:
             Entity.image_cache[entitytype] = self.load_image(entitytype)
         self.sheets = Entity.image_cache[entitytype]
-        self.animations = animation(self.sheets, self.direction)
+
+        if self.static == True:
+            self.animations = None
+        else:
+            self.animations = animation(self.sheets, self.direction)
         self.updatecollider()
 
     
@@ -44,34 +49,44 @@ class Entity:
 
 
     def main(self):
-        if not self.animations.moving:
-            self.animations.animationsteps = 0
-            self.animatespeed = 0.5
-            self.animations.animation_speed = self.animatespeed
-            self.animations.direction= "Idle_" + self.animations.last_direction.split("_")[1]
-            self.animations.Load_animation_frames(self.animations.direction)
+        if self.animations:
+            if not self.animations.moving:
+                self.animations.animationsteps = 0
+                self.animatespeed = 0.5
+                self.animations.animation_speed = self.animatespeed
+                self.animations.direction= "Idle_" + self.animations.last_direction.split("_")[1]
+                self.animations.Load_animation_frames(self.animations.direction)
             
         
-
-        deltatime = self.game.clock.tick(60) / 1000.0
-        self.animations.update(deltatime)
+            
+            deltatime = self.game.clock.tick(60) / 1000.0
+            self.animations.update(deltatime)
         self.updatecollider()
         self.checkcollisions()
 
     def updatecollider(self):
-        collider_height = self.size_y//4+10
-        collider_width = self.size_x + self.size_x*3
-        self.collider = pygame.Rect(self.pos_x - 10, self.pos_y + self.size_y-collider_height, collider_width, collider_height)
+        collider_height = self.size_y*5//3
+        collider_width = self.size_x + self.size_x*5-20
+        self.collider = pygame.Rect(self.pos_x, self.pos_y + self.size_y-collider_height, collider_width, collider_height)
 
     def checkcollisions(self):
         return self.collider.colliderect(self.game.player.collider)
         
 
-            
+    
 
 
     def draw(self):
-        self.animations.draw(self.game, self.pos_x, self.pos_y)
+        if self.animations:
+            self.animations.draw(self.game, self.collider.x, self.collider.y)
+        else:
+            width = self.collider.x
+            height = self.collider.y
+            sprite_renderer = SpriteSheetRenderer(self.sheets["Idle_Down"])
+            scaled_image = sprite_renderer.get_image(width, height, 5, 0)
+            self.game.window.blit(scaled_image, (width, height))
+        pygame.draw.rect(self.game.window, (255,0,0), self.collider, 0)
+            
     
 
     class Player:
@@ -134,6 +149,7 @@ class Entity:
             move_y = 0
             
             
+
             
             self.colliding = Entity.checkcollisions(self)
             

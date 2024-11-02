@@ -20,8 +20,8 @@ class Game:
     
         #Entities
         self.entities = [
-                        Entity(self, "Villager", 14, 20, 200, 200, True, None, "Menu"),
-                        Entity(self, "House1", 88, 112, 500, 300, False, None, None),
+                        Entity(self, "Villager", 14, 20, 200, 200, True, False, None, "Menu"),
+                        Entity(self, "House1", 88, 112, 500, 300, False, True, None, None),
                         ]
         self.player = Entity.Player(self)
         
