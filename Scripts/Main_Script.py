@@ -22,11 +22,12 @@ class Game:
         self.screen_height = display_info.current_h
     
         #Entities
+        self.player = Entity.Player(self)
         self.entities = [
                         Entity(self, "Villager", 14, 20, 200, 200, True, False, None, "Menu"),
                         Entity(self, "House1", 88, 112, 500, 700, False, True, None, None),
                         ]
-        self.player = Entity.Player(self)
+        
 
         
         
@@ -67,7 +68,7 @@ class Game:
             
 
     def render_entities(self):
-        render_object = [(self.player, self.player.player_y)] +[(entity, entity.pos_y) for entity in self.entities]
+        render_object = [(self.player, self.player.player_y + self.player.world_offset_y)] +[(entity, entity.offset_y + self.player.world_offset_y) for entity in self.entities]
         
         render_object.sort(key=lambda obj: obj[1])
 

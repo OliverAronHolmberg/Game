@@ -20,8 +20,9 @@ class Entity:
         self.canmove = canmove
         self.moving = False
         self.static = static
-        self.collider = (0,0,0,0)
         
+        self.offset_x = self.pos_x + self.game.player.world_offset_x
+        self.offset_y = self.pos_y+ self.game.player.world_offset_y
         
         
         self.direction = "Idle_Down"
@@ -64,13 +65,16 @@ class Entity:
             deltatime = self.game.clock.tick(60) / 1000.0
             self.animations.update(deltatime)
         
+        self.offset_x = self.pos_x + self.game.player.world_offset_x
+        self.offset_y = self.pos_y + self.game.player.world_offset_y
+
         self.updatecollider()
         self.checkcollisions()
 
     def updatecollider(self):
         collider_height = self.size_y*5//3
         collider_width = self.size_x* 5
-        self.collider = pygame.Rect(self.pos_x, self.pos_y + self.size_y-collider_height, collider_width, collider_height)
+        self.collider = pygame.Rect(self.offset_x, self.offset_y + self.size_y-collider_height, collider_width, collider_height)
 
     def checkcollisions(self):
         return self.collider.colliderect(self.game.player.collider)
@@ -80,17 +84,17 @@ class Entity:
 
 
     def draw(self):
-        offset_x = self.pos_x + self.game.player.world_offset_x
-        offset_y = self.pos_y + self.game.player.world_offset_y
+        self.offset_x = self.pos_x + self.game.player.world_offset_x
+        self.offset_y = self.pos_y + self.game.player.world_offset_y
         self.updatecollider()
         if self.animations:
-            self.animations.draw(self.game, offset_x, offset_y)
+            self.animations.draw(self.game, self.offset_x, self.offset_y)
         else:
             sprite_renderer = SpriteSheetRenderer(self.sheets["Idle_Down"])
-            scaled_image = sprite_renderer.get_image(offset_x, offset_y, 5, 0)
-            self.game.window.blit(scaled_image, (offset_x-self.size_x,offset_y-self.size_y*3.5))
-        ajust_collider = self.collider.move(self.game.player.world_offset_x, self.game.player.world_offset_y)
-        pygame.draw.rect(self.game.window, (255,0,0), ajust_collider, 2)
+            scaled_image = sprite_renderer.get_image(self.offset_x, self.offset_y, 5, 0)
+            self.game.window.blit(scaled_image, (self.offset_x-self.size_x,self.offset_y-self.size_y*3.5))
+       
+        pygame.draw.rect(self.game.window, (255,0,0), self.collider, 2)
             
     
 
