@@ -118,7 +118,7 @@ class Entity:
             self.animatespeed = 0.05
             self.player_width = 14
             self.player_height = 20
-
+            self.running = False
 
             self.left_boundry = (self.game.screen_width/10) - self.player_width*4
             self.right_boundry = self.game.screen_width - (self.game.screen_width/10) - self.player_width
@@ -156,10 +156,12 @@ class Entity:
             self.animations.moving = False
             move_x = 0
             move_y = 0
+            self.running = False
             
             if keys[pygame.K_LSHIFT]:
                 self.movementspeed = 9
                 self.animatespeed = 0.01
+                self.running = True
             else:
                 self.movementspeed = 5
                 self.animatespeed = 0.05
@@ -255,6 +257,10 @@ class Entity:
             if any(entity.collider.colliderect(self.collider) for entity in self.game.entities):
                 self.player_x = last_x
                 self.player_y = last_y
+                if self.running == True: 
+                    self.animatespeed = 0.15
+                else: 
+                    self.animatespeed = 0.3
                 self.update_playercollider()
         
             if keys[pygame.K_a] or keys[pygame.K_d] or keys[pygame.K_w] or keys[pygame.K_s]:
